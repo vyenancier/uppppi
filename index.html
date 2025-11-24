@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudentSchedule — Расписание студента</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Боковое меню -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>StudentSchedule</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#" data-filter="today" class="active">📅 Сегодня</a></li>
+          <li><a href="#" data-filter="upcoming">🗓 Предстоящее</a></li>
+          <li><a href="#" data-filter="calendar">📆 Календарь</a></li>
+        </ul>
+      </nav>
+
+      <div class="section-title">Мои предметы</div>
+      <ul id="subject-list" class="project-list"></ul>
+
+      <div class="sidebar-footer">
+        <button id="add-subject-btn" class="btn-text">+ Добавить предмет</button>
+      </div>
+    </aside>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+      <header class="main-header">
+        <h1 id="current-view-title">Сегодня</h1>
+        <div class="header-controls">
+          <button id="add-lesson-btn" class="icon-btn" title="Добавить занятие">➕</button>
+          <button id="export-btn" class="icon-btn" title="Экспорт в JSON">📤</button>
+          <button id="theme-toggle" class="icon-btn" title="Тёмная тема">🌙</button>
+        </div>
+      </header>
+
+      <!-- Список занятий -->
+      <div id="lesson-list-container" class="task-list-container">
+        <ul id="lesson-list" class="task-list"></ul>
+        <div id="empty-state" class="empty-state">
+            Нет ничего лучше, чем быть дома...
+        </div>
+      </div>
+
+      <!-- Календарь -->
+      <div id="calendar-container" class="calendar-container" style="display: none;">
+        <div class="calendar-header">
+          <button id="prev-month" class="nav-btn">◀</button>
+          <h3 id="calendar-month-year">Ноябрь 2025</h3>
+          <button id="next-month" class="nav-btn">▶</button>
+          <div class="view-switcher">
+            <button id="view-month" class="view-btn active">Месяц</button>
+            <button id="view-week" class="view-btn">Неделя</button>
+          </div>
+        </div>
+
+        <div id="week-navigation" class="week-navigation" style="display: none;">
+          <button id="prev-week" class="nav-btn">◀ Предыдущая</button>
+          <button id="next-week" class="nav-btn">Следующая ▶</button>
+        </div>
+
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Модальное окно добавления занятия -->
+  <div id="add-lesson-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+
+      <div class="modal-row">
+        <label>Дисциплина:</label>
+        <select id="lesson-subject" class="modal-input"></select>
+      </div>
+
+      <div class="modal-row">
+        <label for="repeat-type">Повторение:</label>
+        <select id="repeat-type" class="modal-input">
+          <option value="once">Однократно</option>
+          <option value="daily">Ежедневно</option>
+          <option value="weekly" selected>Еженедельно</option>
+          <option value="monthly">Ежемесячно</option>
+        </select>
+      </div>
+
+      <div id="once-date" class="modal-row" style="display: none;">
+        <label>Дата занятия:</label>
+        <input type="date" id="once-date-input" class="modal-input" />
+      </div>
+
+      <div id="weekly-days" class="modal-row">
+        <label>Дни недели:</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <label><input type="checkbox" value="1"> Пн</label>
+          <label><input type="checkbox" value="2"> Вт</label>
+          <label><input type="checkbox" value="3"> Ср</label>
+          <label><input type="checkbox" value="4"> Чт</label>
+          <label><input type="checkbox" value="5"> Пт</label>
+          <label><input type="checkbox" value="6"> Сб</label>
+          <label><input type="checkbox" value="7"> Вс</label>
+        </div>
+      </div>
+
+      <div id="monthly-day" class="modal-row" style="display: none;">
+        <label>День месяца:</label>
+        <input type="number" id="day-of-month" min="1" max="31" class="modal-input" value="1" />
+      </div>
+
+      <div class="modal-row">
+        <label>Время занятия:</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="time" id="start-time" class="modal-input" value="09:00" />
+          <span>–</span>
+          <input type="time" id="end-time" class="modal-input" value="10:30" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <label>Преподаватель (необязательно):</label>
+        <input type="text" id="lesson-teacher" class="modal-input" placeholder="ФИО преподавателя" />
+      </div>
+
+      <div class="modal-row">
+        <label>Аудитория / Место:</label>
+        <input type="text" id="lesson-location" class="modal-input" placeholder="Напр., Ауд. 304" />
+      </div>
+
+      <div id="semester-period" class="modal-row">
+        <label>Период действия (семестр):</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="date" id="start-date" class="modal-input" />
+          <input type="date" id="end-date" class="modal-input" />
+        </div>
+      </div>
+
+      <button id="save-lesson-btn" class="save-btn">Сохранить занятие</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования предмета -->
+  <div id="edit-subject-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Редактировать предмет</h3>
+      <input type="text" id="edit-subject-name" placeholder="Название предмета" />
+      <div class="color-picker">
+        <label>Цвет:</label>
+        <input type="color" id="edit-subject-color" value="#fef2fe" />
+      </div>
+      <div class="modal-buttons">
+        <button id="save-subject-btn">Сохранить</button>
+        <button id="cancel-subject-btn">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно просмотра занятия -->
+  <div id="lesson-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeLessonModal()">&times;</span>
+      <h3 id="modal-lesson-title">Математика</h3>
+      <div class="modal-row">
+        <div class="modal-label">Время:</div>
+        <div id="modal-lesson-time">09:00 – 10:30</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Предмет:</div>
+        <div id="modal-lesson-subject">Математика</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Преподаватель:</div>
+        <div id="modal-lesson-teacher">—</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Аудитория:</div>
+        <div id="modal-lesson-location">—</div>
+      </div>
+      <div class="modal-actions">
+        <button onclick="editLesson(currentLessonId)">✏️ Редактировать</button>
+        <button onclick="deleteLesson(currentLessonId)">🗑️ Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
